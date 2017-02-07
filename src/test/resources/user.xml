@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<users>
+	<user>
+		<name>user</name>
+		<password>123456</password>
+		<schemas>CRM_DG_A,ABSP,CRM2_CONF
+		</schemas>
+	</user>
+	<user>
+		<name>root</name>
+		<password>123456</password>
+		<schemas>CRM_DG_A
+		</schemas>
+	</user>
+</users>
