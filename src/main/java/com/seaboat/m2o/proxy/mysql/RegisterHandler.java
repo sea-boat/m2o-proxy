@@ -11,10 +11,19 @@ import com.seaboat.mysql.protocol.CharsetUtil;
 import com.seaboat.mysql.protocol.HandshakePacket;
 import com.seaboat.mysql.protocol.Versions;
 import com.seaboat.mysql.protocol.util.RandomUtil;
-import com.seaboat.net.reactor.ConnectionEventHandler;
-import com.seaboat.net.reactor.ConnectionEvents;
-import com.seaboat.net.reactor.FrontendConnection;
+import com.seaboat.net.reactor.connection.Connection;
+import com.seaboat.net.reactor.connection.ConnectionEventHandler;
+import com.seaboat.net.reactor.connection.ConnectionEvents;
 
+/**
+ * 
+ * <pre><b>RegisterHandler implements ConnectionEventHandler, this handler will be invoked when REGISTE event happens.</b></pre>
+ * @author 
+ * <pre>seaboat</pre>
+ * <pre><b>email: </b>849586227@qq.com</pre>
+ * <pre><b>blog: </b>http://blog.csdn.net/wangyangzhizhou</pre>
+ * @version 1.0
+ */
 public class RegisterHandler implements ConnectionEventHandler {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(RegisterHandler.class);
@@ -23,12 +32,13 @@ public class RegisterHandler implements ConnectionEventHandler {
 		return ConnectionEvents.REGISTE;
 	}
 
-	public void event(FrontendConnection connection) {
+	public void event(Connection connection) {
 		byte[] rand1 = RandomUtil.randomBytes(8);
 		byte[] rand2 = RandomUtil.randomBytes(12);
 		byte[] seed = new byte[rand1.length + rand2.length];
 		System.arraycopy(rand1, 0, seed, 0, rand1.length);
 		System.arraycopy(rand2, 0, seed, rand1.length, rand2.length);
+		((MysqlConnection) connection).setSeed(seed);
 		HandshakePacket hs = new HandshakePacket();
 		hs.packetId = 0;
 		hs.protocolVersion = Versions.PROTOCOL_VERSION;
@@ -46,7 +56,8 @@ public class RegisterHandler implements ConnectionEventHandler {
 		try {
 			connection.write();
 		} catch (IOException e) {
-			LOGGER.warn("IOException happens when writing buffer to frontend connection.");
+			LOGGER.warn("IOException happens when writing buffer to frontend connection : "
+					+ e);
 		}
 	}
 

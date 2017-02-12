@@ -1,7 +1,9 @@
 package com.seaboat.m2o.proxy.configuration;
 
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 
@@ -14,17 +16,17 @@ import java.util.List;
  */
 public class Users {
 
-	private List<User> users = new LinkedList<User>();
+	private Map<String, User> users = new HashMap<String, User>();
 
 	public void addUser(User user) {
-		users.add(user);
+		users.put(user.getName(), user);
 	}
 
-	public List<User> getUsers() {
+	public Map<String, User> getUsers() {
 		return users;
 	}
 
-	public void setUsers(List<User> users) {
+	public void setUsers(Map<String, User> users) {
 		this.users = users;
 	}
 }

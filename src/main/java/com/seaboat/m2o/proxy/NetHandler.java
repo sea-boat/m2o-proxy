@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.seaboat.m2o.proxy.mysql.AuthenticateHandler;
 import com.seaboat.m2o.proxy.mysql.Constants;
 import com.seaboat.m2o.proxy.mysql.MysqlHandler;
-import com.seaboat.net.reactor.FrontendConnection;
+import com.seaboat.net.reactor.connection.Connection;
 import com.seaboat.net.reactor.handler.Handler;
 
 /**
@@ -36,23 +36,13 @@ public class NetHandler implements Handler {
 	/**
 	 *  deal with the received data.
 	 */
-	public void handle(FrontendConnection connection) throws IOException {
+	public void handle(Connection connection) throws IOException {
+		
 		// data must be ready
 		ByteBuffer buff = connection.getReadBuffer();
 		int size = buff.position();
 		LOGGER.debug(connection.getId() + " connection receives "
 				+ buff.position());
-		if (size < 0) {
-			LOGGER.warn("close frontend-connection because it return -1 when doing a read from channel.");
-			connection.close();
-			return;
-		} else if (size == 0) {
-			if (!connection.getChannel().isOpen()) {
-				LOGGER.warn("close frontend-connection because channel has been closed.");
-				connection.close();
-				return;
-			}
-		}
 		// get all data from bytebuffer
 		byte[] thisTime = new byte[size];
 		// flip

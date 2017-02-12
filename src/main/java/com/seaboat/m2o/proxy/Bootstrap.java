@@ -6,10 +6,11 @@ import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.seaboat.m2o.proxy.mysql.MysqlConnectionFactory;
 import com.seaboat.m2o.proxy.mysql.RegisterHandler;
 import com.seaboat.net.reactor.Acceptor;
-import com.seaboat.net.reactor.ConnectionEventHandler;
 import com.seaboat.net.reactor.ReactorPool;
+import com.seaboat.net.reactor.connection.ConnectionEventHandler;
 import com.seaboat.net.reactor.handler.Handler;
 import com.seaboat.net.reactor.handler.MyHandler;
 
@@ -27,7 +28,7 @@ public class Bootstrap {
 			.getLogger(Bootstrap.class);
 	private static final String dateFormat = "yyyy-MM-dd HH:mm:ss";
 	private static String acceptorName = "acceptor-thread";
-	private static String host = "132.122.230.234";
+	private static String host = "localhost";
 	private static int port = 6789;
 
 	public static void main(String[] args) {
@@ -40,6 +41,7 @@ public class Bootstrap {
 			Acceptor acceptor = new Acceptor(reactorPool, acceptorName, host,
 					port);
 			acceptor.addConnectionEventHandler(connectionEventHandler);
+			acceptor.setConnectionFactory(new MysqlConnectionFactory());
 			acceptor.start();
 			LOGGER.info("m2o-proxy has started up successfully.");
 			while (true) {
