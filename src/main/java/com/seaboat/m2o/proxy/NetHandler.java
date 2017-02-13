@@ -8,6 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import com.seaboat.m2o.proxy.mysql.AuthenticateHandler;
 import com.seaboat.m2o.proxy.mysql.Constants;
+import com.seaboat.m2o.proxy.mysql.MysqlConnection;
 import com.seaboat.m2o.proxy.mysql.MysqlHandler;
 import com.seaboat.net.reactor.connection.Connection;
 import com.seaboat.net.reactor.handler.Handler;
@@ -27,17 +28,14 @@ public class NetHandler implements Handler {
 
 	private byte[] data = null;
 
-	private MysqlHandler handler;
-
 	public NetHandler() {
-		this.handler = new AuthenticateHandler();
 	}
 
 	/**
 	 *  deal with the received data.
 	 */
 	public void handle(Connection connection) throws IOException {
-		
+
 		// data must be ready
 		ByteBuffer buff = connection.getReadBuffer();
 		int size = buff.position();
@@ -48,7 +46,7 @@ public class NetHandler implements Handler {
 		// flip
 		buff.flip();
 		buff.get(thisTime);
-		//recycle the buffer
+		// recycle the buffer
 		connection.getReactor().getReactorPool().getBufferPool().recycle(buff);
 		if (data == null) {
 			data = thisTime;
@@ -67,7 +65,8 @@ public class NetHandler implements Handler {
 				+ calculatePayloadLength(data);
 		// enough data to deal with
 		if (data.length >= packetLength) {
-			handler.handle(data, connection);
+			((MysqlConnection) connection).getHandler()
+					.handle(data, connection);
 			data = null;
 		}
 	}

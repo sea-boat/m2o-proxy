@@ -49,7 +49,7 @@ public class AuthenticateHandler implements MysqlHandler {
 		User user = M2OConfig.getInstance().users.getUsers().get(auth.user);
 		if (user == null) {
 			String message = ErrorCode.ER_ACCESS_DENIED_ERROR.message
-					.replaceFirst("%s", user.getName()).replaceFirst("%s", ip)
+					.replaceFirst("%s", auth.user).replaceFirst("%s", ip)
 					.replaceFirst("%s", "YES");
 			int code = ErrorCode.ER_ACCESS_DENIED_ERROR.code;
 			writeErrorMessage(connection, 2, code, message);
@@ -77,6 +77,13 @@ public class AuthenticateHandler implements MysqlHandler {
 			writeErrorMessage(connection, 2, code, message);
 			return;
 		}
+		// change the handler of MysqlConnection to SqlCommandHandler
+		MysqlConnection mysqlConnection = (MysqlConnection) connection;
+		mysqlConnection.setHandler(new SqlCommandHandler());
+		mysqlConnection.setAuthenticated(true);
+		mysqlConnection.setCharsetIndex(auth.charsetIndex);
+		mysqlConnection.setSchema(auth.database);
+		mysqlConnection.setUser(auth.user);
 		// authenticate successfully
 		OKPacket ok = new OKPacket();
 		ok.packetId = 2;
@@ -88,7 +95,7 @@ public class AuthenticateHandler implements MysqlHandler {
 		try {
 			connection.write();
 		} catch (IOException e) {
-			LOGGER.warn("IOException happens when writing buffer to frontend connection.");
+			LOGGER.warn("IOException happens when writing buffer to connection.");
 		}
 	}
 
