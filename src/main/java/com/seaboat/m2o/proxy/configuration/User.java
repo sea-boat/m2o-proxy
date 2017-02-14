@@ -38,7 +38,7 @@ public class User {
 	}
 
 	public void setSchemas(String schemas) {
-		String[] ss = schemas.split("|");
+		String[] ss = schemas.split("\\|");
 		this.schemas = Arrays.asList(ss);
 	}
 }

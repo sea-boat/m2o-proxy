@@ -6,10 +6,8 @@ import java.nio.ByteBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.seaboat.m2o.proxy.mysql.AuthenticateHandler;
 import com.seaboat.m2o.proxy.mysql.Constants;
 import com.seaboat.m2o.proxy.mysql.MysqlConnection;
-import com.seaboat.m2o.proxy.mysql.MysqlHandler;
 import com.seaboat.net.reactor.connection.Connection;
 import com.seaboat.net.reactor.handler.Handler;
 

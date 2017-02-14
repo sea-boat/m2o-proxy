@@ -12,7 +12,6 @@ import com.seaboat.net.reactor.Acceptor;
 import com.seaboat.net.reactor.ReactorPool;
 import com.seaboat.net.reactor.connection.ConnectionEventHandler;
 import com.seaboat.net.reactor.handler.Handler;
-import com.seaboat.net.reactor.handler.MyHandler;
 
 /**
  * 
