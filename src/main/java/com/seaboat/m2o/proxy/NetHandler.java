@@ -37,8 +37,6 @@ public class NetHandler implements Handler {
 		// data must be ready
 		ByteBuffer buff = connection.getReadBuffer();
 		int size = buff.position();
-		LOGGER.debug(connection.getId() + " connection receives "
-				+ buff.position());
 		// get all data from bytebuffer
 		byte[] thisTime = new byte[size];
 		// flip

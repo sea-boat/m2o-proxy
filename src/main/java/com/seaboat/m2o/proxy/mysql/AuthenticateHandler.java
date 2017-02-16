@@ -46,6 +46,8 @@ public class AuthenticateHandler implements MysqlHandler {
 			String[] messages = { auth.user, ip, "YES" };
 			PacketWriterUtil.writeErrorMessage(connection, 2,
 					ErrorCode.ER_ACCESS_DENIED_ERROR, messages);
+			LOGGER.info("authenticate fail. connection id is "
+					+ connection.getId());
 			return;
 		}
 		// calculate encrypted password
@@ -58,14 +60,19 @@ public class AuthenticateHandler implements MysqlHandler {
 			String[] messages = { user.getName(), ip, "YES" };
 			PacketWriterUtil.writeErrorMessage(connection, 2,
 					ErrorCode.ER_ACCESS_DENIED_ERROR, messages);
+			LOGGER.info("authenticate fail. connection id is "
+					+ connection.getId());
 			return;
 		}
 		if (!Arrays.equals(encryptPass, auth.password)) {
 			String[] messages = { user.getName(), ip, "YES" };
 			PacketWriterUtil.writeErrorMessage(connection, 2,
 					ErrorCode.ER_ACCESS_DENIED_ERROR, messages);
+			LOGGER.info("authenticate fail. connection id is "
+					+ connection.getId());
 			return;
 		}
+		LOGGER.info("authenticate successfully. connection id is " + connection.getId());
 		// change the handler of MysqlConnection to SqlCommandHandler
 		MysqlConnection mysqlConnection = (MysqlConnection) connection;
 		mysqlConnection.setHandler(new SqlCommandHandler());

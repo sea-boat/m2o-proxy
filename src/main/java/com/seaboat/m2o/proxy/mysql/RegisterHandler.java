@@ -28,36 +28,36 @@ public class RegisterHandler implements ConnectionEventHandler {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(RegisterHandler.class);
 
-	public int getEventType() {
-		return ConnectionEvents.REGISTE;
-	}
+	private static int INTERESTED = ConnectionEvents.REGISTE;
 
-	public void event(Connection connection) {
-		byte[] rand1 = RandomUtil.randomBytes(8);
-		byte[] rand2 = RandomUtil.randomBytes(12);
-		byte[] seed = new byte[rand1.length + rand2.length];
-		System.arraycopy(rand1, 0, seed, 0, rand1.length);
-		System.arraycopy(rand2, 0, seed, rand1.length, rand2.length);
-		((MysqlConnection) connection).setSeed(seed);
-		HandshakePacket hs = new HandshakePacket();
-		hs.packetId = 0;
-		hs.protocolVersion = Versions.PROTOCOL_VERSION;
-		hs.serverVersion = Versions.SERVER_VERSION;
-		hs.threadId = connection.getId();
-		hs.seed = rand1;
-		hs.serverCapabilities = getServerCapabilities();
-		hs.serverCharsetIndex = (byte) (CharsetUtil.getIndex("utf8") & 0xff);
-		hs.serverStatus = 2;
-		hs.restOfScrambleBuff = rand2;
-		ByteBuffer buffer = connection.getReactor().getReactorPool()
-				.getBufferPool().allocate();
-		hs.write(buffer);
-		connection.WriteToQueue(buffer);
-		try {
-			connection.write();
-		} catch (IOException e) {
-			LOGGER.warn("IOException happens when writing buffer to frontend connection : "
-					+ e);
+	public void event(Connection connection, int event) {
+		if ((event & INTERESTED) != 0) {
+			byte[] rand1 = RandomUtil.randomBytes(8);
+			byte[] rand2 = RandomUtil.randomBytes(12);
+			byte[] seed = new byte[rand1.length + rand2.length];
+			System.arraycopy(rand1, 0, seed, 0, rand1.length);
+			System.arraycopy(rand2, 0, seed, rand1.length, rand2.length);
+			((MysqlConnection) connection).setSeed(seed);
+			HandshakePacket hs = new HandshakePacket();
+			hs.packetId = 0;
+			hs.protocolVersion = Versions.PROTOCOL_VERSION;
+			hs.serverVersion = Versions.SERVER_VERSION;
+			hs.threadId = connection.getId();
+			hs.seed = rand1;
+			hs.serverCapabilities = getServerCapabilities();
+			hs.serverCharsetIndex = (byte) (CharsetUtil.getIndex("utf8") & 0xff);
+			hs.serverStatus = 2;
+			hs.restOfScrambleBuff = rand2;
+			ByteBuffer buffer = connection.getReactor().getReactorPool()
+					.getBufferPool().allocate();
+			hs.write(buffer);
+			connection.WriteToQueue(buffer);
+			try {
+				connection.write();
+			} catch (IOException e) {
+				LOGGER.warn("IOException happens when writing buffer to frontend connection : "
+						+ e);
+			}
 		}
 	}
 

@@ -32,10 +32,13 @@ public class SqlCommandHandler implements MysqlHandler {
 		MysqlConnection mysqlConnection = (MysqlConnection) connection;
 		switch (data[4]) {
 		case MysqlPacket.COM_PING:
-			Ping(mysqlConnection);
+			ping(mysqlConnection);
 			break;
 		case MysqlPacket.COM_INIT_DB:
-			InitDB(mysqlConnection, data);
+			initDB(mysqlConnection, data);
+			break;
+		case MysqlPacket.COM_QUIT:
+			quit(mysqlConnection);
 			break;
 		default:
 			PacketWriterUtil.writeErrorMessage(mysqlConnection, (byte) 1,
@@ -44,7 +47,18 @@ public class SqlCommandHandler implements MysqlHandler {
 		}
 	}
 
-	private void InitDB(MysqlConnection mysqlConnection, byte[] data) {
+	private void quit(MysqlConnection mysqlConnection) {
+		// TODO to close oracle connection 
+		//we can close the client connection directly or return ok packet.
+		try {
+			mysqlConnection.close();
+		} catch (IOException e) {
+			LOGGER.warn("IOException happens when closing the client "+mysqlConnection.getId()+" connection.");
+			e.printStackTrace();
+		}
+	}
+
+	private void initDB(MysqlConnection mysqlConnection, byte[] data) {
 		InitDBPacket packet = new InitDBPacket();
 		packet.read(data);
 		String schema = new String(packet.schema).toUpperCase();
@@ -60,12 +74,13 @@ public class SqlCommandHandler implements MysqlHandler {
 		PacketWriterUtil.writeOKPacket(mysqlConnection, 1);
 	}
 
-	private void Ping(MysqlConnection mysqlConnection) {
+	private void ping(MysqlConnection mysqlConnection) {
 		mysqlConnection.WriteToQueue(ByteBuffer.wrap(OKPacket.OK));
 		try {
 			mysqlConnection.write();
 		} catch (IOException e) {
 			LOGGER.warn("IOException happens when writing buffer to connection.");
+			e.printStackTrace();
 		}
 	}
 
