@@ -14,10 +14,29 @@ import org.apache.commons.digester.Digester;
 public class M2OConfig {
 	private static M2OConfig instance = new M2OConfig();
 	public static final String USER_PATH = "/user.xml";
+	public static final String SERVER_PATH = "/server.xml";
 	public Users users;
+	public Server server;
 
 	private M2OConfig() {
 		users = readUsers();
+		server = readServer();
+	}
+
+	private Server readServer() {
+		try {
+			Digester digester = new Digester();
+			digester.setValidating(false);
+			digester.addObjectCreate("server", Server.class);
+			digester.addBeanPropertySetter("server/port");
+			digester.addBeanPropertySetter("server/host");
+			digester.addBeanPropertySetter("server/acceptorName");
+			return (Server) digester.parse(Server.class
+					.getResourceAsStream(M2OConfig.SERVER_PATH));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 	public static M2OConfig getInstance() {

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<server>
+	<port>6789</port>
+	<host>localhost</host>
+	<acceptorName>acceptor-thread</acceptorName>
+</server>
