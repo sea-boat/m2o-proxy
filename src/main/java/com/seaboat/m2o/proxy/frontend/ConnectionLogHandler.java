@@ -1,4 +1,4 @@
-package com.seaboat.m2o.proxy.mysql;
+package com.seaboat.m2o.proxy.frontend;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

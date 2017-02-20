@@ -1,4 +1,4 @@
-package com.seaboat.m2o.proxy;
+package com.seaboat.m2o.proxy.frontend;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -6,8 +6,8 @@ import java.nio.ByteBuffer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.seaboat.m2o.proxy.mysql.Constants;
-import com.seaboat.m2o.proxy.mysql.MysqlConnection;
+import com.seaboat.m2o.proxy.frontend.mysql.Constants;
+import com.seaboat.m2o.proxy.frontend.mysql.MysqlConnection;
 import com.seaboat.net.reactor.connection.Connection;
 import com.seaboat.net.reactor.handler.Handler;
 

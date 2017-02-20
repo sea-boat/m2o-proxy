@@ -1,4 +1,4 @@
-package com.seaboat.m2o.proxy.mysql;
+package com.seaboat.m2o.proxy.frontend.mysql;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
