@@ -20,7 +20,7 @@ import com.seaboat.net.reactor.handler.Handler;
  * <pre><b>blog: </b>http://blog.csdn.net/wangyangzhizhou</pre>
  * @version 1.0
  */
-public class M2OServer {
+public class M2OServer implements Lifecycle {
 
 	private String acceptorName;
 	private String host;
@@ -32,35 +32,45 @@ public class M2OServer {
 
 	private M2OServer() throws IOException {
 		init();
-		engine = new M2OEngine();
-		Handler handler = new NetHandler();
-		reactorPool = new ReactorPool(Runtime.getRuntime()
-				.availableProcessors(), handler);
-		acceptor = new Acceptor(reactorPool, acceptorName, host, port);
-		acceptor.addConnectionEventHandler(new RegisterHandler());
-		acceptor.addConnectionEventHandler(new ConnectionLogHandler());
-		acceptor.setConnectionFactory(new MysqlConnectionFactory());
 	}
 
 	public M2OEngine getEngine() {
 		return engine;
 	}
 
+	@Override
 	public void start() {
 		acceptor.start();
 	}
 
-	private void init() {
+	@Override
+	public void init() {
 		acceptorName = M2OConfig.getInstance().server.getAcceptorName();
 		host = M2OConfig.getInstance().server.getHost();
 		port = M2OConfig.getInstance().server.getPort();
+		engine = new M2OEngine();
+		try {
+			reactorPool = new ReactorPool(Runtime.getRuntime()
+					.availableProcessors(), new NetHandler());
+			acceptor = new Acceptor(reactorPool, acceptorName, host, port);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		acceptor.addConnectionEventHandler(new RegisterHandler());
+		acceptor.addConnectionEventHandler(new ConnectionLogHandler());
+		acceptor.setConnectionFactory(new MysqlConnectionFactory());
 	}
 
 	public static M2OServer getInstance() throws IOException {
-		//only the main thread will invoke here,will not be multi instances.
+		// only the main thread will invoke here,will not be multi instances.
 		if (server == null) {
 			server = new M2OServer();
 		}
 		return server;
+	}
+
+	@Override
+	public void shutdown() {
+
 	}
 }
