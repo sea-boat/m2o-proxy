@@ -46,7 +46,7 @@ public class M2OConfig {
 	private Users readUsers() {
 		try {
 			Digester digester = new Digester();
-			digester.setValidating(false);
+			digester.setValidating(true);
 			digester.addObjectCreate("users", Users.class);
 			digester.addObjectCreate("users/user", User.class);
 			digester.addBeanPropertySetter("users/user/name");

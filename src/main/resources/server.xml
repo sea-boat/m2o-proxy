@@ -1,4 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE server [
+  <!ELEMENT server (port,host,acceptorName)>
+  <!ELEMENT port (#PCDATA)>
+  <!ELEMENT host (#PCDATA)>
+  <!ELEMENT acceptorName (#PCDATA)>
+]>
 <server>
 	<port>6789</port>
 	<host>localhost</host>

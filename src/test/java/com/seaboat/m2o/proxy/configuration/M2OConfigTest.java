@@ -1,5 +1,6 @@
 package com.seaboat.m2o.proxy.configuration;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -17,5 +18,9 @@ public class M2OConfigTest {
 	public void test() {
 		M2OConfig config = M2OConfig.getInstance();
 		assertTrue(config.users.getUsers().size() == 2);
+		assertEquals(config.users.getUsers().get("user").getName(),"user");
+		assertEquals(config.users.getUsers().get("root").getName(),"root");
+		assertTrue(config.server.getPort()==6789);
+		assertEquals(config.server.getHost(),"localhost");
 	}
 }

@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE users [
+<!ELEMENT users (user+)>
+  <!ELEMENT user (name,password,schemas)>
+  <!ELEMENT name (#PCDATA)>
+  <!ELEMENT password (#PCDATA)>
+  <!ELEMENT schemas (#PCDATA)>
+]>
 <users>
 	<user>
 		<name>user</name>
