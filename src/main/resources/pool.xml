@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE pools [
+  <!ELEMENT pools (host+)>
+  <!ELEMENT host (heartbeat?,pool+)>
+  <!ELEMENT heartbeat (#PCDATA)>
+  <!ELEMENT pool (EMPTY)>
+]>
+
+<pools>
+	<host name="test_DEV"
+		url="jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1520))(CONNECT_DATA=(SERVER = DEDICATED)(SERVICE_NAME=test)))">
+		<heartbeat>select 1 from dual</heartbeat>
+		<pool username="test_A" appId="001" level="high" password="315POjJHN8o="
+			maxActive="300" initialSize="10" minIdle="10" maxIdle="10" maxWait="10000" />
+		<pool username="test_B" appId="002" level="high" password="315POjJHN8o="
+			maxActive="300" initialSize="10" minIdle="10" maxIdle="10" maxWait="10000" />
+	</host>
+	<host name="test_DEV2"
+		url="jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVER = DEDICATED)(SERVICE_NAME=test2)))">
+		<heartbeat>select 1 from dual</heartbeat>
+		<pool username="test_C" password="315POjJHN8o=" />
+	</host>
+</pools>

@@ -41,7 +41,7 @@ public class AuthenticateHandler implements MysqlHandler {
 	public void handle(byte[] data, Connection connection) {
 		AuthPacket auth = new AuthPacket();
 		auth.read(data);
-		User user = M2OConfig.getInstance().users.getUsers().get(auth.user);
+		User user = M2OConfig.getInstance().getUsers().get(auth.user);
 		if (user == null) {
 			String[] messages = { auth.user, ip, "YES" };
 			PacketWriterUtil.writeErrorMessage(connection, 2,

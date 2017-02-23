@@ -62,7 +62,7 @@ public class SqlCommandHandler implements MysqlHandler {
 		InitDBPacket packet = new InitDBPacket();
 		packet.read(data);
 		String schema = new String(packet.schema).toUpperCase();
-		User user = M2OConfig.getInstance().users.getUsers().get(
+		User user = M2OConfig.getInstance().getUsers().get(
 				mysqlConnection.getUser());
 		if (!user.getSchemas().contains(schema)) {
 			String[] db = { schema };

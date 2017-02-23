@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
+
 /**
  * 
  * <pre><b>M2OConfig testcase.</b></pre>
@@ -17,10 +18,14 @@ public class M2OConfigTest {
 	@Test
 	public void test() {
 		M2OConfig config = M2OConfig.getInstance();
-		assertTrue(config.users.getUsers().size() == 2);
-		assertEquals(config.users.getUsers().get("user").getName(),"user");
-		assertEquals(config.users.getUsers().get("root").getName(),"root");
-		assertTrue(config.server.getPort()==6789);
-		assertEquals(config.server.getHost(),"localhost");
+		assertTrue(config.getUsers().size() == 2);
+		assertEquals(config.getUsers().get("user").getName(), "user");
+		assertEquals(config.getUsers().get("root").getName(), "root");
+		assertTrue(config.server.getPort() == 6789);
+		assertEquals(config.server.getHost(), "localhost");
+		assertEquals(config.hosts.get(0).getName(), "test_DEV");
+		assertEquals(config.hosts.size(), 2);
+		assertEquals(config.hosts.get(0).getPools().size(), 2);
+		assertEquals(config.hosts.get(0).getPools().get(0).getUsername(), "test_A");
 	}
 }
