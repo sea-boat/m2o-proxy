@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE pools [
   <!ELEMENT pools (host+)>
-  <!ELEMENT host (heartbeat?,pool+)>
+   <!ATTLIST host name CDATA #REQUIRED url CDATA #REQUIRED >  
+  <!ELEMENT host (heartbeat? , pool+)>
   <!ELEMENT heartbeat (#PCDATA)>
-  <!ELEMENT pool (EMPTY)>
+  <!ELEMENT pool (#PCDATA)>
+  <!ATTLIST pool username CDATA #REQUIRED appId CDATA #IMPLIED level CDATA #IMPLIED password CDATA #REQUIRED maxActive CDATA #IMPLIED initialSize CDATA #IMPLIED minIdle CDATA #IMPLIED maxIdle CDATA #IMPLIED maxWait CDATA #IMPLIED>  
 ]>
 
 <pools>
