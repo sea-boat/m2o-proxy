@@ -11,14 +11,18 @@ package com.seaboat.m2o.proxy.configuration;
  */
 public class Pool {
 	private String username;
-	private int appId;
+	private String appId;
 	private String level;
 	private String password;
 	private int maxActive = 100;
 	private int initialSize = 50;
 	private int minIdle = 50;
-	private int maxIdle = 50;
 	private int maxWait = 10000;
+	private String removeAbandoned = "false";
+	private int removeAbandonedTimeout = 1000;
+	private String testOnBorrow = "false";
+	private String testWhileIdle = "false";
+	private String testOnReturn = "false";
 
 	public String getUsername() {
 		return username;
@@ -28,11 +32,11 @@ public class Pool {
 		this.username = username;
 	}
 
-	public int getAppId() {
+	public String getAppId() {
 		return appId;
 	}
 
-	public void setAppId(int appId) {
+	public void setAppId(String appId) {
 		this.appId = appId;
 	}
 
@@ -76,20 +80,52 @@ public class Pool {
 		this.minIdle = minIdle;
 	}
 
-	public int getMaxIdle() {
-		return maxIdle;
-	}
-
-	public void setMaxIdle(int maxIdle) {
-		this.maxIdle = maxIdle;
-	}
-
 	public int getMaxWait() {
 		return maxWait;
 	}
 
 	public void setMaxWait(int maxWait) {
 		this.maxWait = maxWait;
+	}
+
+	public String getRemoveAbandoned() {
+		return removeAbandoned;
+	}
+
+	public void setRemoveAbandoned(String removeAbandoned) {
+		this.removeAbandoned = removeAbandoned;
+	}
+
+	public int getRemoveAbandonedTimeout() {
+		return removeAbandonedTimeout;
+	}
+
+	public void setRemoveAbandonedTimeout(int removeAbandonedTimeout) {
+		this.removeAbandonedTimeout = removeAbandonedTimeout;
+	}
+
+	public String getTestOnBorrow() {
+		return testOnBorrow;
+	}
+
+	public void setTestOnBorrow(String testOnBorrow) {
+		this.testOnBorrow = testOnBorrow;
+	}
+
+	public String getTestWhileIdle() {
+		return testWhileIdle;
+	}
+
+	public void setTestWhileIdle(String testWhileIdle) {
+		this.testWhileIdle = testWhileIdle;
+	}
+
+	public String getTestOnReturn() {
+		return testOnReturn;
+	}
+
+	public void setTestOnReturn(String testOnReturn) {
+		this.testOnReturn = testOnReturn;
 	}
 
 }

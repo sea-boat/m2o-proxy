@@ -22,8 +22,8 @@ public class M2OConfig {
 	public static final String SERVER_PATH = "/server.xml";
 	public static final String POOL_PATH = "/pool.xml";
 	private Map<String, User> users = new HashMap<String, User>();
-	public List<Host> hosts = new ArrayList<Host>();
-	public Server server;
+	private List<Host> hosts = new ArrayList<Host>();
+	private Server server;
 
 	private M2OConfig() {
 		readUsers();
@@ -83,6 +83,14 @@ public class M2OConfig {
 
 	public void setUsers(Map<String, User> users) {
 		this.users = users;
+	}
+
+	public List<Host> getHosts() {
+		return hosts;
+	}
+
+	public Server getServer() {
+		return server;
 	}
 
 	private void readUsers() {

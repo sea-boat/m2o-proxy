@@ -5,21 +5,22 @@
   <!ELEMENT host (heartbeat? , pool+)>
   <!ELEMENT heartbeat (#PCDATA)>
   <!ELEMENT pool (#PCDATA)>
-  <!ATTLIST pool username CDATA #REQUIRED appId CDATA #IMPLIED level CDATA #IMPLIED password CDATA #REQUIRED maxActive CDATA #IMPLIED initialSize CDATA #IMPLIED minIdle CDATA #IMPLIED maxIdle CDATA #IMPLIED maxWait CDATA #IMPLIED>  
+  <!ATTLIST pool username CDATA #REQUIRED testOnReturn CDATA #IMPLIED testWhileIdle CDATA #IMPLIED  testOnBorrow CDATA #IMPLIED removeAbandonedTimeout CDATA #IMPLIED removeAbandoned CDATA #IMPLIED appId CDATA #IMPLIED level CDATA #IMPLIED password CDATA #REQUIRED maxActive CDATA #IMPLIED initialSize CDATA #IMPLIED minIdle CDATA #IMPLIED  maxWait CDATA #IMPLIED>  
 ]>
 
 <pools>
 	<host name="test_DEV"
-		url="jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1520))(CONNECT_DATA=(SERVER = DEDICATED)(SERVICE_NAME=test)))">
+		url="jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=132.126.3.210)(PORT=1521))(CONNECT_DATA=(SERVER = DEDICATED)(SERVICE_NAME=crmtest)))">
 		<heartbeat>select 1 from dual</heartbeat>
-		<pool username="test_A" appId="001" level="high" password="315POjJHN8o="
-			maxActive="300" initialSize="10" minIdle="10" maxIdle="10" maxWait="10000" />
-		<pool username="test_B" appId="002" level="high" password="315POjJHN8o="
-			maxActive="300" initialSize="10" minIdle="10" maxIdle="10" maxWait="10000" />
+		<pool username="CRM_GZ_A" appId="001" level="high" password="315POjJHN8o="
+			maxActive="300" initialSize="10" minIdle="10" maxWait="10000"
+			removeAbandoned="true" removeAbandonedTimeout="1000" testOnBorrow="true" />
+		<pool username="CRM_GZ_A" appId="002" level="high" password="315POjJHN8o="
+			maxActive="300" initialSize="10" minIdle="10" maxWait="10000" />
 	</host>
 	<host name="test_DEV2"
-		url="jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=localhost)(PORT=1521))(CONNECT_DATA=(SERVER = DEDICATED)(SERVICE_NAME=test2)))">
+		url="jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=132.126.3.210)(PORT=1521))(CONNECT_DATA=(SERVER = DEDICATED)(SERVICE_NAME=crmtest)))">
 		<heartbeat>select 1 from dual</heartbeat>
-		<pool username="test_C" password="315POjJHN8o=" />
+		<pool username="CRM_GZ_A" password="315POjJHN8o=" />
 	</host>
 </pools>

@@ -1,19 +1,7 @@
 package com.seaboat.m2o.proxy;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.seaboat.m2o.proxy.configuration.M2OConfig;
-import com.seaboat.m2o.proxy.frontend.ConnectionLogHandler;
-import com.seaboat.m2o.proxy.frontend.mysql.MysqlConnectionFactory;
-import com.seaboat.m2o.proxy.frontend.mysql.RegisterHandler;
-import com.seaboat.net.reactor.Acceptor;
-import com.seaboat.net.reactor.ReactorPool;
-import com.seaboat.net.reactor.connection.ConnectionEventHandler;
-import com.seaboat.net.reactor.handler.Handler;
 
 /**
  * 

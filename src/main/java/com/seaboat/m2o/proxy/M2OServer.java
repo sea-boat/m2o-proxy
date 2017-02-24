@@ -9,7 +9,6 @@ import com.seaboat.m2o.proxy.frontend.mysql.MysqlConnectionFactory;
 import com.seaboat.m2o.proxy.frontend.mysql.RegisterHandler;
 import com.seaboat.net.reactor.Acceptor;
 import com.seaboat.net.reactor.ReactorPool;
-import com.seaboat.net.reactor.handler.Handler;
 
 /**
  * 
@@ -32,6 +31,7 @@ public class M2OServer implements Lifecycle {
 
 	private M2OServer() throws IOException {
 		init();
+		engine.init();
 	}
 
 	public M2OEngine getEngine() {
@@ -45,9 +45,9 @@ public class M2OServer implements Lifecycle {
 
 	@Override
 	public void init() {
-		acceptorName = M2OConfig.getInstance().server.getAcceptorName();
-		host = M2OConfig.getInstance().server.getHost();
-		port = M2OConfig.getInstance().server.getPort();
+		acceptorName = M2OConfig.getInstance().getServer().getAcceptorName();
+		host = M2OConfig.getInstance().getServer().getHost();
+		port = M2OConfig.getInstance().getServer().getPort();
 		engine = new M2OEngine();
 		try {
 			reactorPool = new ReactorPool(Runtime.getRuntime()
