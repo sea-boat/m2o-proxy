@@ -2,6 +2,7 @@ package com.seaboat.m2o.proxy.frontend.mysql;
 
 import java.nio.channels.SocketChannel;
 
+import com.seaboat.m2o.proxy.M2OServer;
 import com.seaboat.net.reactor.Reactor;
 import com.seaboat.net.reactor.connection.ConnectionFactory;
 
@@ -18,7 +19,10 @@ public class MysqlConnectionFactory implements ConnectionFactory {
 
 	public MysqlConnection createConnection(SocketChannel channel, long id,
 			Reactor reactor) {
-		return new MysqlConnection(channel, id, reactor);
+		MysqlConnection mysqlConnection = new MysqlConnection(channel, id,
+				reactor);
+		mysqlConnection.setEngine(M2OServer.getInstance().getEngine());
+		return mysqlConnection;
 	}
 
 }

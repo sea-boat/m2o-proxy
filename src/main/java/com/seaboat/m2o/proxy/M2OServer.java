@@ -26,7 +26,7 @@ public class M2OServer implements Lifecycle {
 	private int port;
 	private ReactorPool reactorPool;
 	private Acceptor acceptor;
-	private M2OEngine engine;
+	private final M2OEngine engine = new M2OEngine();
 	private static M2OServer server;
 
 	private M2OServer() throws IOException {
@@ -48,7 +48,6 @@ public class M2OServer implements Lifecycle {
 		acceptorName = M2OConfig.getInstance().getServer().getAcceptorName();
 		host = M2OConfig.getInstance().getServer().getHost();
 		port = M2OConfig.getInstance().getServer().getPort();
-		engine = new M2OEngine();
 		try {
 			reactorPool = new ReactorPool(Runtime.getRuntime()
 					.availableProcessors(), new NetHandler());
@@ -61,10 +60,15 @@ public class M2OServer implements Lifecycle {
 		acceptor.setConnectionFactory(new MysqlConnectionFactory());
 	}
 
-	public static M2OServer getInstance() throws IOException {
+	public static M2OServer getInstance() {
 		// only the main thread will invoke here,will not be multi instances.
 		if (server == null) {
-			server = new M2OServer();
+			try {
+				server = new M2OServer();
+			} catch (IOException e) {
+				server = null;
+				e.printStackTrace();
+			}
 		}
 		return server;
 	}

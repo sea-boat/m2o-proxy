@@ -8,6 +8,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<logback.version>1.1.7</logback.version>
+		<druid.version>1.0.28</druid.version>
 	</properties>
 
 	<dependencies>
@@ -30,6 +31,11 @@
 			<groupId>commons-digester</groupId>
 			<artifactId>commons-digester</artifactId>
 			<version>2.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.alibaba</groupId>
+			<artifactId>druid</artifactId>
+			<version>${druid.version}</version>
 		</dependency>
 	</dependencies>
 </project>

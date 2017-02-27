@@ -2,6 +2,7 @@ package com.seaboat.m2o.proxy.frontend.mysql;
 
 import java.nio.channels.SocketChannel;
 
+import com.seaboat.m2o.proxy.M2OEngine;
 import com.seaboat.net.reactor.Reactor;
 import com.seaboat.net.reactor.connection.Connection;
 
@@ -20,11 +21,15 @@ public class MysqlConnection extends Connection {
 	private String schema;
 	private String user;
 	private int charsetIndex;
+	private volatile boolean autoCommit;
 	private byte[] seed;
 	private MysqlHandler handler;
+	private M2OEngine engine;
+	private long executeBeginTime;
 
 	public MysqlConnection(SocketChannel channel, long id, Reactor reactor) {
 		super(channel, id, reactor);
+		this.autoCommit = true;
 		this.handler = new AuthenticateHandler();
 	}
 
@@ -74,6 +79,30 @@ public class MysqlConnection extends Connection {
 
 	public void setCharsetIndex(int charsetIndex) {
 		this.charsetIndex = charsetIndex;
+	}
+
+	public boolean isAutoCommit() {
+		return autoCommit;
+	}
+
+	public void setAutoCommit(boolean autoCommit) {
+		this.autoCommit = autoCommit;
+	}
+
+	public M2OEngine getEngine() {
+		return engine;
+	}
+
+	public void setEngine(M2OEngine engine) {
+		this.engine = engine;
+	}
+
+	public long getExecuteBeginTime() {
+		return executeBeginTime;
+	}
+
+	public void setExecuteBeginTime(long executeBeginTime) {
+		this.executeBeginTime = executeBeginTime;
 	}
 
 }

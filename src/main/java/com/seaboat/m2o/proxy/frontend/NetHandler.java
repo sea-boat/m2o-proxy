@@ -21,8 +21,6 @@ import com.seaboat.net.reactor.handler.Handler;
  * @version 1.0
  */
 public class NetHandler implements Handler {
-	private static final Logger LOGGER = LoggerFactory
-			.getLogger(NetHandler.class);
 
 	private byte[] data = null;
 

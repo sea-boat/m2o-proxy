@@ -21,11 +21,12 @@ public class M2OConfigTest {
 		assertTrue(config.getUsers().size() == 2);
 		assertEquals(config.getUsers().get("user").getName(), "user");
 		assertEquals(config.getUsers().get("root").getName(), "root");
-		assertTrue(config.server.getPort() == 6789);
-		assertEquals(config.server.getHost(), "localhost");
-		assertEquals(config.hosts.get(0).getName(), "test_DEV");
-		assertEquals(config.hosts.size(), 2);
-		assertEquals(config.hosts.get(0).getPools().size(), 2);
-		assertEquals(config.hosts.get(0).getPools().get(0).getUsername(), "test_A");
+		assertTrue(config.getServer().getPort() == 6789);
+		assertEquals(config.getServer().getHost(), "localhost");
+		assertEquals(config.getHosts().get(0).getName(), "test_DEV");
+		assertEquals(config.getHosts().size(), 2);
+		assertEquals(config.getHosts().get(0).getPools().size(), 2);
+		assertEquals(config.getHosts().get(0).getPools().get(0).getUsername(),
+				"test_A");
 	}
 }
