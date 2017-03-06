@@ -30,7 +30,7 @@ public class M2OServer implements Lifecycle {
 	private static M2OServer server;
 
 	private M2OServer() throws IOException {
-		init();
+		this.init();
 		engine.init();
 	}
 

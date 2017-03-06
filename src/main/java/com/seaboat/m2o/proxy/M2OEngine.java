@@ -10,8 +10,11 @@ import org.slf4j.LoggerFactory;
 import com.seaboat.m2o.proxy.backend.ConnectionPool;
 import com.seaboat.m2o.proxy.configuration.M2OConfig;
 import com.seaboat.m2o.proxy.configuration.User;
+import com.seaboat.m2o.proxy.exception.JSONFormatException;
 import com.seaboat.m2o.proxy.frontend.mysql.MysqlConnection;
 import com.seaboat.m2o.proxy.frontend.mysql.PacketWriterUtil;
+import com.seaboat.m2o.proxy.util.PreparedStatementParameter;
+import com.seaboat.m2o.proxy.util.PreparedStatementParameterJson;
 import com.seaboat.mysql.protocol.InitDBPacket;
 import com.seaboat.mysql.protocol.MysqlMessage;
 import com.seaboat.mysql.protocol.OKPacket;
@@ -111,6 +114,38 @@ public class M2OEngine implements Lifecycle {
 		}
 		if (mysqlConnection.isAutoCommit())
 			mysqlConnection.setExecuteBeginTime(System.currentTimeMillis());
+		String hint = null;
+		String level = null;
+		PreparedStatementParameter parameters = null;
+		int begin = sql.indexOf("/** ");
+		int end = sql.indexOf("**/");
+		if (begin != -1 && end != -1) {
+			hint = sql.substring(begin + 3, end);
+			try {
+				parameters = PreparedStatementParameterJson.JSON2Object(hint);
+			} catch (JSONFormatException e) {
+				PacketWriterUtil.writeErrorMessage(mysqlConnection, (byte) 1,
+						ErrorCode.ER_YES, null);
+				e.printStackTrace();
+				return;
+			}
+			sql = sql.substring(end + 3, sql.length());
+		}
+		begin = sql.indexOf("/*+");
+		end = sql.indexOf("*/");
+		if (begin != -1 && end != -1) {
+			level = sql.substring(begin + 3, end).toUpperCase();
+			if (level.indexOf("HIGH") != -1) {
+				level = "HIGH";
+			} else if (level.indexOf("LOW") != -1) {
+				level = "LOW";
+			} else {
+				level = null;
+			}
+			if (level != null)
+				sql = sql.substring(0, begin)
+						+ sql.substring(end + 2, sql.length());
+		}
 	}
 
 }
