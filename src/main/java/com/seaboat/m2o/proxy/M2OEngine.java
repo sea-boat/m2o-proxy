@@ -15,6 +15,7 @@ import com.seaboat.m2o.proxy.frontend.mysql.MysqlConnection;
 import com.seaboat.m2o.proxy.frontend.mysql.PacketWriterUtil;
 import com.seaboat.m2o.proxy.util.PreparedStatementParameter;
 import com.seaboat.m2o.proxy.util.PreparedStatementParameterJson;
+import com.seaboat.m2o.proxy.util.SqlTypeParser;
 import com.seaboat.mysql.protocol.InitDBPacket;
 import com.seaboat.mysql.protocol.MysqlMessage;
 import com.seaboat.mysql.protocol.OKPacket;
@@ -114,20 +115,36 @@ public class M2OEngine implements Lifecycle {
 		}
 		if (mysqlConnection.isAutoCommit())
 			mysqlConnection.setExecuteBeginTime(System.currentTimeMillis());
+		Object[] object = parseHint(sql);
+		PreparedStatementParameter parameters = (PreparedStatementParameter) object[0];
+		if (parameters == null) {
+			PacketWriterUtil.writeErrorMessage(mysqlConnection, (byte) 1,
+					ErrorCode.ER_YES, null);
+			return;
+		}
+		String level = (String) object[1];
+		sql = (String) object[2];
+        int type = SqlTypeParser.parse(sql);
+        switch(type){
+        case(SqlTypeParser.SHOW):
+        	
+        	return;
+        }
+	}
+
+	private Object[] parseHint(String sql) {
 		String hint = null;
 		String level = null;
-		PreparedStatementParameter parameters = null;
 		int begin = sql.indexOf("/** ");
 		int end = sql.indexOf("**/");
+		PreparedStatementParameter parameters = null;
 		if (begin != -1 && end != -1) {
 			hint = sql.substring(begin + 3, end);
 			try {
 				parameters = PreparedStatementParameterJson.JSON2Object(hint);
 			} catch (JSONFormatException e) {
-				PacketWriterUtil.writeErrorMessage(mysqlConnection, (byte) 1,
-						ErrorCode.ER_YES, null);
 				e.printStackTrace();
-				return;
+				return null;
 			}
 			sql = sql.substring(end + 3, sql.length());
 		}
@@ -146,6 +163,7 @@ public class M2OEngine implements Lifecycle {
 				sql = sql.substring(0, begin)
 						+ sql.substring(end + 2, sql.length());
 		}
+		return new Object[] { parameters, level, sql };
 	}
 
 }
