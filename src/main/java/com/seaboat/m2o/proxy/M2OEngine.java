@@ -3,6 +3,8 @@ package com.seaboat.m2o.proxy;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,8 @@ import com.seaboat.m2o.proxy.configuration.User;
 import com.seaboat.m2o.proxy.exception.JSONFormatException;
 import com.seaboat.m2o.proxy.frontend.mysql.MysqlConnection;
 import com.seaboat.m2o.proxy.frontend.mysql.PacketWriterUtil;
+import com.seaboat.m2o.proxy.frontend.mysql.filter.MysqlFilter;
+import com.seaboat.m2o.proxy.frontend.mysql.filter.ShowWarningFilter;
 import com.seaboat.m2o.proxy.util.PreparedStatementParameter;
 import com.seaboat.m2o.proxy.util.PreparedStatementParameterJson;
 import com.seaboat.m2o.proxy.util.SqlTypeParser;
@@ -33,24 +37,25 @@ import com.seaboat.mysql.protocol.constant.ErrorCode;
 public class M2OEngine implements Lifecycle {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(M2OEngine.class);
+	
+	private List<MysqlFilter> filters = new ArrayList<MysqlFilter>();
 
 	private ConnectionPool connectionPool = new ConnectionPool();
 
 	@Override
 	public void init() {
+		filters.add(new ShowWarningFilter());
 		connectionPool.init();
 	}
 
 	@Override
 	public void start() {
-		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
 	public void shutdown() {
-		// TODO Auto-generated method stub
-
+		
 	}
 
 	public void ping(MysqlConnection mysqlConnection) {
