@@ -13,6 +13,6 @@ import com.seaboat.m2o.proxy.frontend.mysql.MysqlConnection;
  */
 public interface MysqlFilter {
 
-	public void doFilter(MysqlConnection c, String sql);
+	public boolean doFilter(MysqlConnection c, String sql, String type);
 
 }

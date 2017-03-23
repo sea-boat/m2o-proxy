@@ -16,7 +16,7 @@ import com.seaboat.m2o.proxy.exception.JSONFormatException;
 import com.seaboat.m2o.proxy.frontend.mysql.MysqlConnection;
 import com.seaboat.m2o.proxy.frontend.mysql.PacketWriterUtil;
 import com.seaboat.m2o.proxy.frontend.mysql.filter.MysqlFilter;
-import com.seaboat.m2o.proxy.frontend.mysql.filter.ShowWarningFilter;
+import com.seaboat.m2o.proxy.frontend.mysql.filter.ShowFilter;
 import com.seaboat.m2o.proxy.util.PreparedStatementParameter;
 import com.seaboat.m2o.proxy.util.PreparedStatementParameterJson;
 import com.seaboat.m2o.proxy.util.SqlTypeParser;
@@ -37,25 +37,25 @@ import com.seaboat.mysql.protocol.constant.ErrorCode;
 public class M2OEngine implements Lifecycle {
 	private static final Logger LOGGER = LoggerFactory
 			.getLogger(M2OEngine.class);
-	
+
 	private List<MysqlFilter> filters = new ArrayList<MysqlFilter>();
 
 	private ConnectionPool connectionPool = new ConnectionPool();
 
 	@Override
 	public void init() {
-		filters.add(new ShowWarningFilter());
+		filters.add(new ShowFilter());
 		connectionPool.init();
 	}
 
 	@Override
 	public void start() {
-		
+
 	}
 
 	@Override
 	public void shutdown() {
-		
+
 	}
 
 	public void ping(MysqlConnection mysqlConnection) {
@@ -122,19 +122,19 @@ public class M2OEngine implements Lifecycle {
 			mysqlConnection.setExecuteBeginTime(System.currentTimeMillis());
 		Object[] object = parseHint(sql);
 		PreparedStatementParameter parameters = (PreparedStatementParameter) object[0];
-		if (parameters == null) {
-			PacketWriterUtil.writeErrorMessage(mysqlConnection, (byte) 1,
-					ErrorCode.ER_YES, null);
+		String level;
+		if (parameters != null) {
+			level = (String) object[1];
+			sql = (String) object[2];
+		}
+		int type = SqlTypeParser.parse(sql);
+		switch (type) {
+		case (SqlTypeParser.SHOW):
+			for (MysqlFilter filter : filters)
+				if (filter.doFilter(mysqlConnection, sql, "SHOW"))
+					return;
 			return;
 		}
-		String level = (String) object[1];
-		sql = (String) object[2];
-        int type = SqlTypeParser.parse(sql);
-        switch(type){
-        case(SqlTypeParser.SHOW):
-        	
-        	return;
-        }
 	}
 
 	private Object[] parseHint(String sql) {

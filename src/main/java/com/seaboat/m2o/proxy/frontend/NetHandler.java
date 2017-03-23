@@ -3,8 +3,8 @@ package com.seaboat.m2o.proxy.frontend;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import com.seaboat.m2o.proxy.frontend.mysql.Constants;
 import com.seaboat.m2o.proxy.frontend.mysql.MysqlConnection;
+import com.seaboat.m2o.proxy.util.Constants;
 import com.seaboat.net.reactor.connection.Connection;
 import com.seaboat.net.reactor.handler.Handler;
 

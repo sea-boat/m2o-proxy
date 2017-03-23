@@ -1,4 +1,4 @@
-package com.seaboat.m2o.proxy.frontend.mysql;
+package com.seaboat.m2o.proxy.util;
 
 /**
  * 

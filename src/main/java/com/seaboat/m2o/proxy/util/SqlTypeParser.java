@@ -575,7 +575,7 @@ public final class SqlTypeParser {
 			char c3 = stmt.charAt(++offset);
 			if ((c1 == 'O' || c1 == 'o') && (c2 == 'W' || c2 == 'w')
 					&& (c3 == ' ' || c3 == '\t' || c3 == '\r' || c3 == '\n')) {
-				return (offset << 8) | SHOW;
+				return SHOW;
 			}
 		}
 		return OTHER;

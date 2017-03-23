@@ -7,9 +7,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.seaboat.mysql.protocol.Capabilities;
-import com.seaboat.mysql.protocol.CharsetUtil;
 import com.seaboat.mysql.protocol.HandshakePacket;
 import com.seaboat.mysql.protocol.Versions;
+import com.seaboat.mysql.protocol.util.CharsetUtil;
 import com.seaboat.mysql.protocol.util.RandomUtil;
 import com.seaboat.net.reactor.connection.Connection;
 import com.seaboat.net.reactor.connection.ConnectionEventHandler;
