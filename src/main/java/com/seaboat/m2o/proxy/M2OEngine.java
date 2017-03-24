@@ -134,7 +134,19 @@ public class M2OEngine implements Lifecycle {
 				if (filter.doFilter(mysqlConnection, sql, "SHOW"))
 					return;
 			return;
+		case (SqlTypeParser.USE):
+			dealWithUse(mysqlConnection, sql);
+			return;
 		}
+	}
+
+	private void dealWithUse(MysqlConnection mysqlConnection, String sql) {
+		String schema = sql.trim().toUpperCase();
+		if (schema.length() > 0)
+			if (schema.endsWith(";"))
+				schema = schema.substring(0, schema.length() - 1);
+		mysqlConnection.setSchema(schema);
+		PacketWriterUtil.writeOKPacket(mysqlConnection);
 	}
 
 	private Object[] parseHint(String sql) {

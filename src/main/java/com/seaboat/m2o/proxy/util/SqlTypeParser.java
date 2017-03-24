@@ -121,7 +121,7 @@ public final class SqlTypeParser {
 			char c3 = stmt.charAt(++offset);
 			if ((c1 == 'E' || c1 == 'e') && (c2 == 'L' || c2 == 'l')
 					&& (c3 == 'P' || c3 == 'p')) {
-				return (offset << 8) | HELP;
+				return HELP;
 			}
 		}
 		return OTHER;
@@ -168,7 +168,7 @@ public final class SqlTypeParser {
 					case 'q':
 						return killQueryCheck(stmt, offset);
 					default:
-						return (offset << 8) | KILL;
+						return KILL;
 					}
 				}
 				return OTHER;
@@ -196,7 +196,7 @@ public final class SqlTypeParser {
 					case '\n':
 						continue;
 					default:
-						return (offset << 8) | KILL_QUERY;
+						return KILL_QUERY;
 					}
 				}
 				return OTHER;
@@ -476,7 +476,7 @@ public final class SqlTypeParser {
 			char c3 = stmt.charAt(++offset);
 			if ((c1 == 'U' || c1 == 'u') && (c2 == 'T' || c2 == 't')
 					&& (c3 == 'E' || c3 == 'e') && (stmt.length() == ++offset)) {
-				return (offset << 8) | ROUTE;
+				return ROUTE;
 			}
 		}
 		return OTHER;
@@ -538,7 +538,7 @@ public final class SqlTypeParser {
 					char c = stmt.charAt(offset);
 					if (c == ' ' || c == '\r' || c == '\n' || c == '\t'
 							|| c == '/' || c == '#') {
-						return (offset << 8) | SET;
+						return SET;
 					}
 				}
 				return OTHER;
@@ -561,7 +561,7 @@ public final class SqlTypeParser {
 					&& (c3 == 'T' || c3 == 't')
 					&& (c4 == ' ' || c4 == '\t' || c4 == '\r' || c4 == '\n'
 							|| c4 == '/' || c4 == '#')) {
-				return (offset << 8) | SELECT;
+				return SELECT;
 			}
 		}
 		return OTHER;
@@ -591,7 +591,7 @@ public final class SqlTypeParser {
 			if ((c1 == 'A' || c1 == 'a') && (c2 == 'R' || c2 == 'r')
 					&& (c3 == 'T' || c3 == 't')
 					&& (c4 == ' ' || c4 == '\t' || c4 == '\r' || c4 == '\n')) {
-				return (offset << 8) | START;
+				return START;
 			}
 		}
 		return OTHER;
@@ -624,7 +624,7 @@ public final class SqlTypeParser {
 					&& (c3 == 'C' || c3 == 'c') && (c4 == 'A' || c4 == 'a')
 					&& (c5 == 'T' || c5 == 't') && (c6 == 'E' || c6 == 'e')
 					&& (c7 == ' ' || c7 == '\t' || c7 == '\r' || c7 == '\n')) {
-				return (offset << 8) | TRUNCATE;
+				return TRUNCATE;
 			}
 		}
 		return OTHER;
@@ -658,7 +658,7 @@ public final class SqlTypeParser {
 					char c2 = stmt.charAt(++offset);
 					if ((c1 == 'E' || c1 == 'e')
 							&& (c2 == ' ' || c2 == '\t' || c2 == '\r' || c2 == '\n')) {
-						return (offset << 8) | USE;
+						return USE;
 					}
 				}
 				break;
