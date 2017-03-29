@@ -130,14 +130,26 @@ public class M2OEngine implements Lifecycle {
 		int type = SqlTypeParser.parse(sql);
 		switch (type) {
 		case (SqlTypeParser.SHOW):
-			for (MysqlFilter filter : filters)
-				if (filter.doFilter(mysqlConnection, sql, "SHOW"))
-					return;
+			dealWithShow(mysqlConnection, sql);
 			return;
 		case (SqlTypeParser.USE):
 			dealWithUse(mysqlConnection, sql);
 			return;
+		case (SqlTypeParser.SET):
+			dealWithSet(mysqlConnection, sql);
+			return;
 		}
+	}
+
+	private void dealWithSet(MysqlConnection mysqlConnection, String sql) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private void dealWithShow(MysqlConnection mysqlConnection, String sql) {
+		for (MysqlFilter filter : filters)
+			if (filter.doFilter(mysqlConnection, sql, "SHOW"))
+				return;
 	}
 
 	private void dealWithUse(MysqlConnection mysqlConnection, String sql) {

@@ -3,8 +3,6 @@ package com.seaboat.m2o.proxy.frontend.mysql.filter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +11,6 @@ import com.seaboat.m2o.proxy.frontend.mysql.MysqlConnection;
 import com.seaboat.mysql.protocol.ColumnCountPacket;
 import com.seaboat.mysql.protocol.ColumnDefinitionPacket;
 import com.seaboat.mysql.protocol.EOFPacket;
-import com.seaboat.mysql.protocol.ResultsetRowPacket;
 import com.seaboat.mysql.protocol.constant.ColumnType;
 import com.seaboat.mysql.protocol.util.CharsetUtil;
 
