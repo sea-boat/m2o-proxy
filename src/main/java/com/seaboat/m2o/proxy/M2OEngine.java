@@ -9,6 +9,11 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.alibaba.druid.sql.ast.SQLStatement;
+import com.alibaba.druid.sql.ast.statement.SQLSetStatement;
+import com.alibaba.druid.sql.ast.statement.SQLUseStatement;
+import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlShowStatement;
+import com.alibaba.druid.sql.dialect.mysql.parser.MySqlStatementParser;
 import com.seaboat.m2o.proxy.backend.ConnectionPool;
 import com.seaboat.m2o.proxy.configuration.M2OConfig;
 import com.seaboat.m2o.proxy.configuration.User;
@@ -19,7 +24,6 @@ import com.seaboat.m2o.proxy.frontend.mysql.filter.MysqlFilter;
 import com.seaboat.m2o.proxy.frontend.mysql.filter.ShowFilter;
 import com.seaboat.m2o.proxy.util.PreparedStatementParameter;
 import com.seaboat.m2o.proxy.util.PreparedStatementParameterJson;
-import com.seaboat.m2o.proxy.util.SqlTypeParser;
 import com.seaboat.mysql.protocol.InitDBPacket;
 import com.seaboat.mysql.protocol.MysqlMessage;
 import com.seaboat.mysql.protocol.OKPacket;
@@ -127,15 +131,17 @@ public class M2OEngine implements Lifecycle {
 			level = (String) object[1];
 			sql = (String) object[2];
 		}
-		int type = SqlTypeParser.parse(sql);
-		switch (type) {
-		case (SqlTypeParser.SHOW):
+		MySqlStatementParser parser = new MySqlStatementParser(sql);
+		SQLStatement statement = parser.parseStatement();
+		if (statement instanceof MySqlShowStatement) {
 			dealWithShow(mysqlConnection, sql);
 			return;
-		case (SqlTypeParser.USE):
+		}
+		if (statement instanceof SQLUseStatement) {
 			dealWithUse(mysqlConnection, sql);
 			return;
-		case (SqlTypeParser.SET):
+		}
+		if (statement instanceof SQLSetStatement) {
 			dealWithSet(mysqlConnection, sql);
 			return;
 		}
@@ -143,7 +149,6 @@ public class M2OEngine implements Lifecycle {
 
 	private void dealWithSet(MysqlConnection mysqlConnection, String sql) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	private void dealWithShow(MysqlConnection mysqlConnection, String sql) {
