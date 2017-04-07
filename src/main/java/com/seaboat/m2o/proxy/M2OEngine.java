@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.statement.SQLSetStatement;
+import com.alibaba.druid.sql.ast.statement.SQLShowTablesStatement;
 import com.alibaba.druid.sql.ast.statement.SQLUseStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlShowStatement;
 import com.alibaba.druid.sql.dialect.mysql.parser.MySqlStatementParser;
@@ -131,9 +132,18 @@ public class M2OEngine implements Lifecycle {
 			level = (String) object[1];
 			sql = (String) object[2];
 		}
-		MySqlStatementParser parser = new MySqlStatementParser(sql);
-		SQLStatement statement = parser.parseStatement();
-		if (statement instanceof MySqlShowStatement) {
+		SQLStatement statement = null;
+		try {
+			MySqlStatementParser parser = new MySqlStatementParser(sql);
+			statement = parser.parseStatement();
+		} catch (Exception e) {
+			LOGGER.warn("exception : ", e);
+			PacketWriterUtil.writeErrorMessage(mysqlConnection, (byte) 1,
+					ErrorCode.ER_YES, new String[] {});
+			return;
+		}
+		if (statement instanceof MySqlShowStatement
+				|| statement instanceof SQLShowTablesStatement) {
 			dealWithShow(mysqlConnection, sql);
 			return;
 		}
@@ -142,13 +152,38 @@ public class M2OEngine implements Lifecycle {
 			return;
 		}
 		if (statement instanceof SQLSetStatement) {
-			dealWithSet(mysqlConnection, sql);
+			dealWithSet(mysqlConnection, sql, (SQLSetStatement) statement);
 			return;
 		}
+
 	}
 
-	private void dealWithSet(MysqlConnection mysqlConnection, String sql) {
+	private void dealWithSet(MysqlConnection mysqlConnection, String sql,
+			SQLSetStatement statement) {
 		// TODO Auto-generated method stub
+		List<?> list = statement.getItems();
+		if (list.size() > 0) {
+			String flag = list.get(0).toString().split("=")[1].trim();
+			if (flag.equals("1") || flag.equalsIgnoreCase("true")) {
+				if (mysqlConnection.isAutoCommit()) {
+					// do nothing
+				} else {
+					mysqlConnection.rollback();
+					mysqlConnection.setAutoCommit(true);
+				}
+				PacketWriterUtil.writeOKPacket(mysqlConnection);
+			} else {
+				if (mysqlConnection.isAutoCommit()) {
+					mysqlConnection.setAutoCommit(false);
+				} else {
+					mysqlConnection.rollback();
+					mysqlConnection.setAutoCommit(false);
+				}
+				PacketWriterUtil.writeACOFFPacket(mysqlConnection);
+			}
+			return;
+		}
+
 	}
 
 	private void dealWithShow(MysqlConnection mysqlConnection, String sql) {

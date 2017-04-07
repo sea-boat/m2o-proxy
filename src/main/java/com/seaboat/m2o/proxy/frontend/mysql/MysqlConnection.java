@@ -105,4 +105,9 @@ public class MysqlConnection extends Connection {
 		this.executeBeginTime = executeBeginTime;
 	}
 
+	public void rollback() {
+		// TODO Auto-generated method stub
+		//don't write package to client
+	}
+
 }

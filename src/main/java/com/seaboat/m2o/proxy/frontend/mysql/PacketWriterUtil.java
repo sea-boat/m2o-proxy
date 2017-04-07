@@ -68,4 +68,13 @@ public class PacketWriterUtil {
 			LOGGER.warn("IOException happens when writing buffer to connection.");
 		}
 	}
+
+	public static void writeACOFFPacket(Connection connection) {
+		connection.WriteToQueue(ByteBuffer.wrap(OKPacket.AC_OFF));
+		try {
+			connection.write();
+		} catch (IOException e) {
+			LOGGER.warn("IOException happens when writing buffer to connection.");
+		}
+	}
 }
