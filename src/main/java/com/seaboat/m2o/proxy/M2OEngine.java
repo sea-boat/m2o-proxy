@@ -13,6 +13,7 @@ import com.alibaba.druid.sql.ast.SQLStatement;
 import com.alibaba.druid.sql.ast.statement.SQLSetStatement;
 import com.alibaba.druid.sql.ast.statement.SQLShowTablesStatement;
 import com.alibaba.druid.sql.ast.statement.SQLUseStatement;
+import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSetNamesStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlShowStatement;
 import com.alibaba.druid.sql.dialect.mysql.parser.MySqlStatementParser;
 import com.seaboat.m2o.proxy.backend.ConnectionPool;
@@ -23,12 +24,14 @@ import com.seaboat.m2o.proxy.frontend.mysql.MysqlConnection;
 import com.seaboat.m2o.proxy.frontend.mysql.PacketWriterUtil;
 import com.seaboat.m2o.proxy.frontend.mysql.filter.MysqlFilter;
 import com.seaboat.m2o.proxy.frontend.mysql.filter.ShowFilter;
+import com.seaboat.m2o.proxy.util.Constants;
 import com.seaboat.m2o.proxy.util.PreparedStatementParameter;
 import com.seaboat.m2o.proxy.util.PreparedStatementParameterJson;
 import com.seaboat.mysql.protocol.InitDBPacket;
 import com.seaboat.mysql.protocol.MysqlMessage;
 import com.seaboat.mysql.protocol.OKPacket;
 import com.seaboat.mysql.protocol.constant.ErrorCode;
+import com.seaboat.mysql.protocol.util.CharsetUtil;
 
 /**
  * 
@@ -151,6 +154,20 @@ public class M2OEngine implements Lifecycle {
 			dealWithUse(mysqlConnection, sql);
 			return;
 		}
+		if (statement instanceof MySqlSetNamesStatement) {
+			MySqlSetNamesStatement sStatement = (MySqlSetNamesStatement) statement;
+			String charset = sStatement.getCharSet();
+			if (CharsetUtil.getIndex(charset) != 0) {// check if proxy support
+				// this charset
+				mysqlConnection.setCharset(charset);
+				PacketWriterUtil.writeOKPacket(mysqlConnection, 1);
+			} else {
+				PacketWriterUtil.writeErrorMessage(mysqlConnection, 1,
+						ErrorCode.ER_UNKNOWN_CHARACTER_SET,
+						new String[] { charset });
+			}
+			return;
+		}
 		if (statement instanceof SQLSetStatement) {
 			dealWithSet(mysqlConnection, sql, (SQLSetStatement) statement);
 			return;
@@ -163,23 +180,26 @@ public class M2OEngine implements Lifecycle {
 		// TODO Auto-generated method stub
 		List<?> list = statement.getItems();
 		if (list.size() > 0) {
-			String flag = list.get(0).toString().split("=")[1].trim();
-			if (flag.equals("1") || flag.equalsIgnoreCase("true")) {
-				if (mysqlConnection.isAutoCommit()) {
-					// do nothing
+			String key = list.get(0).toString().split("=")[0];
+			String value = list.get(0).toString().split("=")[1].trim();
+			if (key.equalsIgnoreCase(Constants.AUTOCOMMIT)) {
+				if (value.equals("1") || value.equalsIgnoreCase("true")) {
+					if (mysqlConnection.isAutoCommit()) {
+						// do nothing
+					} else {
+						mysqlConnection.rollback();
+						mysqlConnection.setAutoCommit(true);
+					}
+					PacketWriterUtil.writeOKPacket(mysqlConnection);
 				} else {
-					mysqlConnection.rollback();
-					mysqlConnection.setAutoCommit(true);
+					if (mysqlConnection.isAutoCommit()) {
+						mysqlConnection.setAutoCommit(false);
+					} else {
+						mysqlConnection.rollback();
+						mysqlConnection.setAutoCommit(false);
+					}
+					PacketWriterUtil.writeACOFFPacket(mysqlConnection);
 				}
-				PacketWriterUtil.writeOKPacket(mysqlConnection);
-			} else {
-				if (mysqlConnection.isAutoCommit()) {
-					mysqlConnection.setAutoCommit(false);
-				} else {
-					mysqlConnection.rollback();
-					mysqlConnection.setAutoCommit(false);
-				}
-				PacketWriterUtil.writeACOFFPacket(mysqlConnection);
 			}
 			return;
 		}

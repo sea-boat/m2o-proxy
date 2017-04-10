@@ -13,4 +13,8 @@ public class Constants {
 
 	public static int PACKET_HEADER_LENGTH = 4;
 
+	public static String AUTOCOMMIT = "AUTOCOMMIT";
+
+	public static String NAMES = "NAME";
+
 }
