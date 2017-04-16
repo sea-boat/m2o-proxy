@@ -5,14 +5,17 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.alibaba.druid.sql.ast.SQLStatement;
+import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.ast.statement.SQLSetStatement;
 import com.alibaba.druid.sql.ast.statement.SQLShowTablesStatement;
 import com.alibaba.druid.sql.ast.statement.SQLUseStatement;
+import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSetNamesStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlShowStatement;
 import com.alibaba.druid.sql.dialect.mysql.parser.MySqlStatementParser;
@@ -27,9 +30,13 @@ import com.seaboat.m2o.proxy.frontend.mysql.filter.ShowFilter;
 import com.seaboat.m2o.proxy.util.Constants;
 import com.seaboat.m2o.proxy.util.PreparedStatementParameter;
 import com.seaboat.m2o.proxy.util.PreparedStatementParameterJson;
+import com.seaboat.mysql.protocol.ColumnCountPacket;
+import com.seaboat.mysql.protocol.ColumnDefinitionPacket;
+import com.seaboat.mysql.protocol.EOFPacket;
 import com.seaboat.mysql.protocol.InitDBPacket;
 import com.seaboat.mysql.protocol.MysqlMessage;
 import com.seaboat.mysql.protocol.OKPacket;
+import com.seaboat.mysql.protocol.constant.ColumnType;
 import com.seaboat.mysql.protocol.constant.ErrorCode;
 import com.seaboat.mysql.protocol.util.CharsetUtil;
 
@@ -145,6 +152,10 @@ public class M2OEngine implements Lifecycle {
 					ErrorCode.ER_YES, new String[] {});
 			return;
 		}
+		if (statement instanceof SQLSelectStatement) {
+			dealWithSelect(mysqlConnection, (SQLSelectStatement) statement);
+			return;
+		}
 		if (statement instanceof MySqlShowStatement
 				|| statement instanceof SQLShowTablesStatement) {
 			dealWithShow(mysqlConnection, sql);
@@ -173,6 +184,51 @@ public class M2OEngine implements Lifecycle {
 			return;
 		}
 
+	}
+
+	private void dealWithSelect(MysqlConnection mysqlConnection,
+			SQLSelectStatement statement) {
+		String query = ((MySqlSelectQueryBlock) statement.getSelect()
+				.getQuery()).getSelectList().get(0).toString();
+		if (query.equalsIgnoreCase("@@version_comment")) {
+			ByteBuffer buffer = mysqlConnection.getReactor().getReactorPool()
+					.getBufferPool().allocate();
+			ColumnCountPacket header = new ColumnCountPacket();
+			header.columnCount = 1;
+			header.packetId = (byte) 1;
+			header.write(buffer);
+			byte packetId = 0;
+			ColumnDefinitionPacket[] fields = new ColumnDefinitionPacket[1];
+			fields[0] = new ColumnDefinitionPacket();
+			fields[0].charsetSet = CharsetUtil.getIndex("utf-8");
+			try {
+				fields[0].name = "@@version_comment".getBytes("utf-8");
+			} catch (UnsupportedEncodingException e1) {
+				//will not happen
+				e1.printStackTrace();
+			}
+			fields[0].type = ColumnType.FIELD_TYPE_STRING;
+			fields[0].packetId = ++packetId;
+			for (ColumnDefinitionPacket field : fields) {
+				field.write(buffer);
+				packetId = field.packetId;
+			}
+			EOFPacket eof = new EOFPacket();
+			eof.packetId = ++packetId;
+			eof.write(buffer);
+			packetId = eof.packetId;
+			EOFPacket lastEof = new EOFPacket();
+			lastEof.packetId = ++packetId;
+			lastEof.write(buffer);
+			mysqlConnection.WriteToQueue(buffer);
+			try {
+				mysqlConnection.write();
+			} catch (IOException e) {
+				LOGGER.warn("IOException happens when writing buffer to frontend connection : "
+						+ e);
+			}
+			return;
+		}
 	}
 
 	private void dealWithSet(MysqlConnection mysqlConnection, String sql,
