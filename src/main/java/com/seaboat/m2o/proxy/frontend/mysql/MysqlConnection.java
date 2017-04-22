@@ -3,6 +3,7 @@ package com.seaboat.m2o.proxy.frontend.mysql;
 import java.nio.channels.SocketChannel;
 
 import com.seaboat.m2o.proxy.M2OEngine;
+import com.seaboat.m2o.proxy.M2OSession;
 import com.seaboat.net.reactor.Reactor;
 import com.seaboat.net.reactor.connection.Connection;
 
@@ -26,6 +27,7 @@ public class MysqlConnection extends Connection {
 	private MysqlHandler handler;
 	private M2OEngine engine;
 	private long executeBeginTime;
+	private M2OSession session;
 
 	public MysqlConnection(SocketChannel channel, long id, Reactor reactor) {
 		super(channel, id, reactor);
@@ -108,6 +110,14 @@ public class MysqlConnection extends Connection {
 	public void rollback() {
 		// TODO Auto-generated method stub
 		//don't write package to client
+	}
+
+	public M2OSession getSession() {
+		return session;
+	}
+
+	public void setSession(M2OSession session) {
+		this.session = session;
 	}
 
 }

@@ -26,6 +26,7 @@ import com.seaboat.m2o.proxy.exception.JSONFormatException;
 import com.seaboat.m2o.proxy.frontend.mysql.MysqlConnection;
 import com.seaboat.m2o.proxy.frontend.mysql.PacketWriterUtil;
 import com.seaboat.m2o.proxy.frontend.mysql.filter.MysqlFilter;
+import com.seaboat.m2o.proxy.frontend.mysql.filter.SelectFilter;
 import com.seaboat.m2o.proxy.frontend.mysql.filter.ShowFilter;
 import com.seaboat.m2o.proxy.util.Constants;
 import com.seaboat.m2o.proxy.util.PreparedStatementParameter;
@@ -60,6 +61,7 @@ public class M2OEngine implements Lifecycle {
 	@Override
 	public void init() {
 		filters.add(new ShowFilter());
+		filters.add(new SelectFilter());
 		connectionPool.init();
 	}
 
@@ -190,45 +192,9 @@ public class M2OEngine implements Lifecycle {
 			SQLSelectStatement statement) {
 		String query = ((MySqlSelectQueryBlock) statement.getSelect()
 				.getQuery()).getSelectList().get(0).toString();
-		if (query.equalsIgnoreCase("@@version_comment")) {
-			ByteBuffer buffer = mysqlConnection.getReactor().getReactorPool()
-					.getBufferPool().allocate();
-			ColumnCountPacket header = new ColumnCountPacket();
-			header.columnCount = 1;
-			header.packetId = (byte) 1;
-			header.write(buffer);
-			byte packetId = 0;
-			ColumnDefinitionPacket[] fields = new ColumnDefinitionPacket[1];
-			fields[0] = new ColumnDefinitionPacket();
-			fields[0].charsetSet = CharsetUtil.getIndex("utf-8");
-			try {
-				fields[0].name = "@@version_comment".getBytes("utf-8");
-			} catch (UnsupportedEncodingException e1) {
-				//will not happen
-				e1.printStackTrace();
-			}
-			fields[0].type = ColumnType.FIELD_TYPE_STRING;
-			fields[0].packetId = ++packetId;
-			for (ColumnDefinitionPacket field : fields) {
-				field.write(buffer);
-				packetId = field.packetId;
-			}
-			EOFPacket eof = new EOFPacket();
-			eof.packetId = ++packetId;
-			eof.write(buffer);
-			packetId = eof.packetId;
-			EOFPacket lastEof = new EOFPacket();
-			lastEof.packetId = ++packetId;
-			lastEof.write(buffer);
-			mysqlConnection.WriteToQueue(buffer);
-			try {
-				mysqlConnection.write();
-			} catch (IOException e) {
-				LOGGER.warn("IOException happens when writing buffer to frontend connection : "
-						+ e);
-			}
-			return;
-		}
+		for (MysqlFilter filter : filters)
+			if (filter.doFilter(mysqlConnection, query, "SELECT"))
+				return;
 	}
 
 	private void dealWithSet(MysqlConnection mysqlConnection, String sql,
