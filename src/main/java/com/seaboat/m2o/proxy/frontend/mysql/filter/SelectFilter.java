@@ -33,11 +33,11 @@ public class SelectFilter implements MysqlFilter {
 			if (sql.equalsIgnoreCase("@@version_comment")) {
 				ByteBuffer buffer = c.getReactor().getReactorPool()
 						.getBufferPool().allocate();
+				byte packetId = 0;
 				ColumnCountPacket header = new ColumnCountPacket();
 				header.columnCount = 1;
-				header.packetId = (byte) 1;
+				header.packetId = ++packetId;
 				header.write(buffer);
-				byte packetId = 0;
 				ColumnDefinitionPacket[] fields = new ColumnDefinitionPacket[1];
 				fields[0] = new ColumnDefinitionPacket();
 				fields[0].charsetSet = CharsetUtil.getIndex("utf-8");

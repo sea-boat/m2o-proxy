@@ -1,5 +1,7 @@
 package com.seaboat.m2o.proxy.backend;
 
+import java.sql.Connection;
+
 /**
  * 
  * <pre><b>m2o back-end connections interface.</b></pre>
@@ -17,4 +19,6 @@ public interface BackendConnection {
 	public void rollbackWithoutResponse();
 
 	public void rollback();
+	
+	public void setCon(Connection c);
 }

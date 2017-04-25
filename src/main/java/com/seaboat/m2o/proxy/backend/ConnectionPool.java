@@ -1,5 +1,7 @@
 package com.seaboat.m2o.proxy.backend;
 
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -17,6 +19,7 @@ import com.seaboat.m2o.proxy.Lifecycle;
 import com.seaboat.m2o.proxy.configuration.Host;
 import com.seaboat.m2o.proxy.configuration.M2OConfig;
 import com.seaboat.m2o.proxy.configuration.Pool;
+import com.seaboat.m2o.proxy.exception.PoolNotExistException;
 
 /**
  * 
@@ -93,6 +96,79 @@ public class ConnectionPool implements Lifecycle {
 			level = pool.getLevel();
 		String username = pool.getUsername();
 		return username + appId + level;
+	}
+
+	/**
+	 * @param key
+	 * @param appId
+	 * @param level
+	 * @return oracle connection
+	 */
+	public OracleConnection getNormalConnectionByKey(String key, String appId,
+			String level) throws SQLException, PoolNotExistException {
+		OracleConnection connection = new OracleConnection();
+		DataSource source = getDataSource(key, appId, level);
+		if (source == null)
+			throw new PoolNotExistException(
+					"username or appid or level is not exist: username = "
+							+ key + ", appid = " + appId + ", level = " + level);
+		LOGGER.debug(source.toString());
+		Connection c = source.getConnection();
+		c.rollback();
+		connection.setCon(c);
+		return connection;
+	}
+
+	/**
+	* @param key
+	* @param appId
+	* @param level
+	* @return DataSource
+	*/
+	private DataSource getDataSource(String key, String appId, String level) {
+		LOGGER.debug("key = " + key + ", appId = " + appId + ", level = "
+				+ level);
+		if (appId == null || appId.equals("")) {
+			if (level == null || level.equals("")) {
+				for (String k : pools.keySet()) {
+					if (k.startsWith(key) && k.endsWith("HIGH"))
+						return pools.get(k);
+					if (k.contains(key))
+						return pools.get(k);
+				}
+			} else {
+				for (String k : pools.keySet()) {
+					if (k.startsWith(key) && k.endsWith(level))
+						return pools.get(k);
+				}
+			}
+		}
+
+		if (level == null || level.equals("")) {
+			if (appId == null || appId.equals("")) {
+				for (String k : pools.keySet()) {
+					if (k.startsWith(key) && k.endsWith("HIGH"))
+						return pools.get(k);
+					if (k.contains(key))
+						return pools.get(k);
+				}
+			} else {
+				DataSource pooled = pools.get(key + appId + "HIGH");
+				if (pooled != null)
+					return pooled;
+			}
+		}
+
+		if (appId != null && level != null && !appId.equals("")
+				&& !level.equals("")) {
+			DataSource pooled = pools.get(key + appId + level);
+			if (pooled != null)
+				return pooled;
+		}
+
+		LOGGER.info("can not get a datasource in the ConnectionPool by key="
+				+ key + ", appId=" + appId + ", level=" + level);
+		return null;
 	}
 
 	@Override

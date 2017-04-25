@@ -1,5 +1,7 @@
 package com.seaboat.m2o.proxy.backend;
 
+import java.sql.Connection;
+
 /**
  * 
  * <pre><b>one of the m2o back-end connections. it encapsulates jdbc connections.</b></pre>
@@ -27,6 +29,11 @@ public class OracleConnection implements BackendConnection {
 	}
 
 	public void rollback() {
+		// TODO Auto-generated method stub
+
+	}
+
+	public void setCon(Connection c) {
 		// TODO Auto-generated method stub
 
 	}
