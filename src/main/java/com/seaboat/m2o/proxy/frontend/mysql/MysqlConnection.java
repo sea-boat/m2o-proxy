@@ -28,6 +28,7 @@ public class MysqlConnection extends Connection {
 	private M2OEngine engine;
 	private long executeBeginTime;
 	private M2OSession session;
+	private String AppId;
 
 	public MysqlConnection(SocketChannel channel, long id, Reactor reactor) {
 		super(channel, id, reactor);
@@ -49,6 +50,14 @@ public class MysqlConnection extends Connection {
 
 	public void setHandler(MysqlHandler handler) {
 		this.handler = handler;
+	}
+
+	public String getAppId() {
+		return AppId;
+	}
+
+	public void setAppId(String appId) {
+		AppId = appId;
 	}
 
 	public boolean isAuthenticated() {

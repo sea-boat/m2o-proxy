@@ -78,8 +78,18 @@ public class AuthenticateHandler implements MysqlHandler {
 		mysqlConnection.setHandler(new SqlCommandHandler());
 		mysqlConnection.setAuthenticated(true);
 		mysqlConnection.setCharsetIndex(auth.charsetIndex);
-		mysqlConnection.setSchema(auth.database);
+		String schema = auth.database;
+        String appId = null;
+        if(schema==null)
+            schema ="";
+        if(schema.indexOf("&&") != -1){
+            String s[] = schema.split("&&");
+            schema = s[0].toUpperCase();
+            appId = s[1].toUpperCase();
+        }
+		mysqlConnection.setSchema(schema);
 		mysqlConnection.setUser(auth.user);
+		mysqlConnection.setAppId(appId);
 		// authenticate successfully
 		PacketWriterUtil.writeOKPacket(mysqlConnection, 2);
 	}

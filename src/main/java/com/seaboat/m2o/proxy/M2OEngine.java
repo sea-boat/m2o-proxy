@@ -3,6 +3,7 @@ package com.seaboat.m2o.proxy;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import com.seaboat.m2o.proxy.backend.ConnectionPool;
 import com.seaboat.m2o.proxy.configuration.M2OConfig;
 import com.seaboat.m2o.proxy.configuration.User;
 import com.seaboat.m2o.proxy.exception.JSONFormatException;
+import com.seaboat.m2o.proxy.exception.PoolNotExistException;
 import com.seaboat.m2o.proxy.frontend.mysql.MysqlConnection;
 import com.seaboat.m2o.proxy.frontend.mysql.PacketWriterUtil;
 import com.seaboat.m2o.proxy.frontend.mysql.filter.MysqlFilter;
@@ -139,7 +141,7 @@ public class M2OEngine implements Lifecycle {
 			mysqlConnection.setExecuteBeginTime(System.currentTimeMillis());
 		Object[] object = parseHint(sql);
 		PreparedStatementParameter parameters = (PreparedStatementParameter) object[0];
-		String level;
+		String level = null;
 		if (parameters != null) {
 			level = (String) object[1];
 			sql = (String) object[2];
@@ -155,7 +157,8 @@ public class M2OEngine implements Lifecycle {
 			return;
 		}
 		if (statement instanceof SQLSelectStatement) {
-			dealWithSelect(mysqlConnection, (SQLSelectStatement) statement);
+			dealWithSelect(mysqlConnection, (SQLSelectStatement) statement,
+					level);
 			return;
 		}
 		if (statement instanceof MySqlShowStatement
@@ -189,12 +192,20 @@ public class M2OEngine implements Lifecycle {
 	}
 
 	private void dealWithSelect(MysqlConnection mysqlConnection,
-			SQLSelectStatement statement) {
+			SQLSelectStatement statement, String level) {
 		String query = ((MySqlSelectQueryBlock) statement.getSelect()
 				.getQuery()).getSelectList().get(0).toString();
 		for (MysqlFilter filter : filters)
 			if (filter.doFilter(mysqlConnection, query, "SELECT"))
 				return;
+		try {
+			connectionPool.getNormalConnectionByKey(mysqlConnection.getUser(),
+					mysqlConnection.getAppId(), level);
+		} catch (SQLException e) {
+			LOGGER.warn("" + e);
+		} catch (PoolNotExistException e) {
+			LOGGER.warn("" + e);
+		}
 	}
 
 	private void dealWithSet(MysqlConnection mysqlConnection, String sql,
